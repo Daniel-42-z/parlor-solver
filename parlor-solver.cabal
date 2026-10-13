@@ -61,6 +61,7 @@ library
     -- Modules exported by the library.
     exposed-modules:
         Parlor
+        Puzzle
         Statement
 
     -- Modules included in this library but not exported.
@@ -75,7 +76,7 @@ library
         , containers
 
     -- Directories containing source files.
-    hs-source-dirs:   lib
+    hs-source-dirs:   . lib
 
     -- Base language which the package is written in.
     default-language: GHC2024
