@@ -4,10 +4,10 @@ module Parlor
     ParlorPuzzle,
     ParlorSolution (..),
     checkSolution,
-    Color (..),
+    Box (..),
     allValidSolutions,
-    statementsOfColor,
-    truthValuesOfColor,
+    statementsOfBox,
+    truthValuesOfBox,
   )
 where
 
@@ -15,31 +15,31 @@ import Data.Function ((&))
 import Data.Map (Map)
 import Data.Map qualified as Map
 
-data Color = Blue | White | Black deriving (Eq, Ord, Show)
+data Box = Blue | White | Black deriving (Eq, Ord, Show)
 
 data ParlorSolution = ParlorSolution
-  { answer :: Color,
-    truthValuesMap :: Map Color [Bool]
+  { answer :: Box,
+    truthValuesMap :: Map Box [Bool]
   }
   deriving (Eq)
 
 instance Show ParlorSolution where
   show (ParlorSolution ans tvs) = "Gems in " ++ show ans ++ " box." ++ "\n" ++ "Truth values for each box:\n" ++ show (Map.toList tvs)
 
-type StatementPos = (Color, Int)
+type StatementPos = (Box, Int)
 
 type ParlorStatement = StatementPos -> ParlorSolution -> Bool -- Returns true if statement doesn't contradict input state
 
 condFlip :: ParlorStatement -> Bool -> ParlorStatement
 condFlip st b = if b then st else (not .) . st
 
-type ParlorPuzzle = Map Color [ParlorStatement]
+type ParlorPuzzle = Map Box [ParlorStatement]
 
-statementsOfColor :: ParlorPuzzle -> Color -> [ParlorStatement]
-statementsOfColor pzl color = Map.findWithDefault [] color pzl
+statementsOfBox :: ParlorPuzzle -> Box -> [ParlorStatement]
+statementsOfBox pzl box = Map.findWithDefault [] box pzl
 
-truthValuesOfColor :: ParlorSolution -> Color -> [Bool]
-truthValuesOfColor (ParlorSolution _ tss) color = Map.findWithDefault [] color tss
+truthValuesOfBox :: ParlorSolution -> Box -> [Bool]
+truthValuesOfBox (ParlorSolution _ tss) box = Map.findWithDefault [] box tss
 
 validSolution :: ParlorSolution -> Bool
 validSolution sol = any (\bs -> not (null bs) && and bs) ts && any (\bs -> not (null bs) && all (== False) bs) ts
@@ -53,9 +53,9 @@ checkSolution pzl solution
   | otherwise =
       [Blue, White, Black]
         & map
-          ( \color ->
-              let (statements, truthValues) = (statementsOfColor pzl color, truthValuesOfColor solution color)
-                  consistencies = zipWith3 (\i statement truthValue -> condFlip statement truthValue (color, i) solution) [0 ..] statements truthValues
+          ( \box ->
+              let (statements, truthValues) = (statementsOfBox pzl box, truthValuesOfBox solution box)
+                  consistencies = zipWith3 (\i statement truthValue -> condFlip statement truthValue (box, i) solution) [0 ..] statements truthValues
                in and consistencies
           )
         & and
@@ -65,17 +65,17 @@ allValidSolutions pzl =
   let allBoolLists :: Int -> [[Bool]]
       allBoolLists 0 = [[]]
       allBoolLists n = (map (True :) $ allBoolLists (n - 1)) ++ (map (False :) $ allBoolLists (n - 1))
-      allTruthValueMaps :: [Map Color [Bool]]
+      allTruthValueMaps :: [Map Box [Bool]]
       allTruthValueMaps =
         [ [ (Blue, blueTvs),
             (White, whiteTvs),
             (Black, blackTvs)
           ]
-        | blueTvs <- allBoolLists $ length $ statementsOfColor pzl Blue,
-          whiteTvs <- allBoolLists $ length $ statementsOfColor pzl White,
-          blackTvs <- allBoolLists $ length $ statementsOfColor pzl Black
+        | blueTvs <- allBoolLists $ length $ statementsOfBox pzl Blue,
+          whiteTvs <- allBoolLists $ length $ statementsOfBox pzl White,
+          blackTvs <- allBoolLists $ length $ statementsOfBox pzl Black
         ]
           & map (Map.fromList)
    in filter
         (checkSolution pzl)
-        [ParlorSolution color tvMap | color <- [Blue, White, Black], tvMap <- allTruthValueMaps]
+        [ParlorSolution box tvMap | box <- [Blue, White, Black], tvMap <- allTruthValueMaps]

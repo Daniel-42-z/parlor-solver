@@ -1,6 +1,6 @@
 module Statement
-  ( true,
-    false,
+  ( truth,
+    lie,
     notStatement,
     iff,
     ifStatement,
@@ -11,7 +11,7 @@ module Statement
     geq,
     less,
     leq,
-    constCnt,
+    constCount,
     allTrueBoxesCount,
     allFalseBoxesCount,
     boxTrueStatementsCount,
@@ -33,13 +33,13 @@ where
 
 import Data.Function ((&))
 import Data.Map qualified as Map
-import Parlor (Color (Black, Blue, White), ParlorSolution (ParlorSolution), ParlorStatement, StatementPos, truthValuesOfColor)
+import Parlor (Box (Black, Blue, White), ParlorSolution (ParlorSolution), ParlorStatement, StatementPos, truthValuesOfBox)
 
-false :: ParlorStatement
-false _ _ = False
+truth :: ParlorStatement
+truth _ _ = True
 
-true :: ParlorStatement
-true _ _ = True
+lie :: ParlorStatement
+lie _ _ = False
 
 notStatement :: ParlorStatement -> ParlorStatement
 notStatement st = (not .) . st
@@ -58,8 +58,8 @@ orStatement st1 st2 pos sol = st1 pos sol || st2 pos sol
 
 type CountingStatement = StatementPos -> ParlorSolution -> Int
 
-constCnt :: Int -> CountingStatement
-constCnt n = \_ _ -> n
+constCount :: Int -> CountingStatement
+constCount n = \_ _ -> n
 
 allTrueBoxesCount :: CountingStatement
 allTrueBoxesCount _ (ParlorSolution _ tvs) = (Map.elems tvs) & map and & filter id & length
@@ -67,11 +67,11 @@ allTrueBoxesCount _ (ParlorSolution _ tvs) = (Map.elems tvs) & map and & filter 
 allFalseBoxesCount :: CountingStatement
 allFalseBoxesCount _ (ParlorSolution _ tvs) = (Map.elems tvs) & map (all not) & filter id & length
 
-boxTrueStatementsCount :: Color -> CountingStatement
-boxTrueStatementsCount c _ sol = length $ filter id $ truthValuesOfColor sol c
+boxTrueStatementsCount :: Box -> CountingStatement
+boxTrueStatementsCount c _ sol = length $ filter id $ truthValuesOfBox sol c
 
-boxFalseStatementsCount :: Color -> CountingStatement
-boxFalseStatementsCount c _ sol = length $ filter not $ truthValuesOfColor sol c
+boxFalseStatementsCount :: Box -> CountingStatement
+boxFalseStatementsCount c _ sol = length $ filter not $ truthValuesOfBox sol c
 
 totalTrueStatements :: CountingStatement
 totalTrueStatements pos sol = sum $ map (\c -> boxTrueStatementsCount c pos sol) [Blue, White, Black]
@@ -94,32 +94,32 @@ less c1 c2 pos sol = c1 pos sol < c2 pos sol
 leq :: CountingStatement -> CountingStatement -> ParlorStatement
 leq c1 c2 pos sol = c1 pos sol <= c2 pos sol
 
-hasGems :: Color -> ParlorStatement
-hasGems color _ (ParlorSolution ans _) = ans == color
+hasGems :: Box -> ParlorStatement
+hasGems box _ (ParlorSolution ans _) = ans == box
 
-empty :: Color -> ParlorStatement
-empty color _ (ParlorSolution ans _) = ans /= color
+empty :: Box -> ParlorStatement
+empty box _ (ParlorSolution ans _) = ans /= box
 
-allTrue :: Color -> ParlorStatement
-allTrue color _ sol = and $ truthValuesOfColor sol color
+allTrue :: Box -> ParlorStatement
+allTrue box _ sol = and $ truthValuesOfBox sol box
 
-allFalse :: Color -> ParlorStatement
-allFalse color _ sol = all not $ truthValuesOfColor sol color
+allFalse :: Box -> ParlorStatement
+allFalse box _ sol = all not $ truthValuesOfBox sol box
 
-someTrue :: Color -> ParlorStatement
-someTrue color _ sol = or $ truthValuesOfColor sol color
+someTrue :: Box -> ParlorStatement
+someTrue box _ sol = or $ truthValuesOfBox sol box
 
-someFalse :: Color -> ParlorStatement
-someFalse color _ sol = any not $ truthValuesOfColor sol color
+someFalse :: Box -> ParlorStatement
+someFalse box _ sol = any not $ truthValuesOfBox sol box
 
-thisBox :: (Color -> ParlorStatement) -> ParlorStatement
-thisBox colorProp = \(color, i) sol -> colorProp color (color, i) sol
+thisBox :: (Box -> ParlorStatement) -> ParlorStatement
+thisBox prop = \(box, i) sol -> prop box (box, i) sol
 
-gemBox :: (Color -> ParlorStatement) -> ParlorStatement
-gemBox colorProp = \pos (ParlorSolution ans tvs) -> colorProp ans pos (ParlorSolution ans tvs)
+gemBox :: (Box -> ParlorStatement) -> ParlorStatement
+gemBox prop = \pos (ParlorSolution ans tvs) -> prop ans pos (ParlorSolution ans tvs)
 
-someBox :: (Color -> ParlorStatement) -> (Color -> ParlorStatement) -> ParlorStatement
+someBox :: (Box -> ParlorStatement) -> (Box -> ParlorStatement) -> ParlorStatement
 someBox prop1 prop2 = \pos sol -> not $ null [c | c <- [Blue, White, Black], prop1 c pos sol && prop2 c pos sol]
 
-allBoxes :: (Color -> ParlorStatement) -> (Color -> ParlorStatement) -> ParlorStatement
-allBoxes cond prop = \pos sol -> all (\color -> prop color pos sol) [c | c <- [Blue, White, Black], cond c pos sol]
+allBoxes :: (Box -> ParlorStatement) -> (Box -> ParlorStatement) -> ParlorStatement
+allBoxes cond prop = \pos sol -> all (\box -> prop box pos sol) [c | c <- [Blue, White, Black], cond c pos sol]
