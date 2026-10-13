@@ -24,7 +24,7 @@ data ParlorSolution = ParlorSolution
   deriving (Eq)
 
 instance Show ParlorSolution where
-  show (ParlorSolution ans tvs) = "Gem in " ++ show ans ++ " box." ++ "\n" ++ "Truth values for each box:\n" ++ show (Map.toList tvs)
+  show (ParlorSolution ans tvs) = "Gems in " ++ show ans ++ " box." ++ "\n" ++ "Truth values for each box:\n" ++ show (Map.toList tvs)
 
 type StatementPos = (Color, Int)
 
