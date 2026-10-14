@@ -6,21 +6,17 @@ import Statement
 -- Write the puzzle to solve here
 puzzle =
   [ ( Blue,
-      [ someBox someTrue empty,
-        someBox someFalse empty,
-        empty White
+      [ notStatement $ thisBox hasGems,
+        foldr1 andStatement $ map hasGems allBoxes
       ]
     ),
     ( White,
-      [ someBox allTrue empty,
-        empty Black,
-        orStatement (empty White) (empty Black)
+      [ thisBox hasGems,
+        allFalse Black `iff` allTrue Blue
       ]
     ),
     ( Black,
-      [ someBox (\b -> more (boxFalseStatementsCount b) (constCount 1)) empty,
-        empty Black,
-        someBox allFalse empty
+      [ thisBox (\b -> contents White `eq` contents b)
       ]
     )
   ]
