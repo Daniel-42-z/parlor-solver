@@ -1,4 +1,4 @@
-module Statement
+module Vocab
   ( truth,
     lie,
     notStatement,
@@ -81,10 +81,10 @@ totalTrueStatements pos sol = sum $ map (\c -> boxTrueStatementsCount c pos sol)
 totalFalseStatements :: BoxProp Int
 totalFalseStatements pos sol = sum $ map (\c -> boxFalseStatementsCount c pos sol) [Blue, White, Black]
 
-data BoxContents = Empty | Gem deriving (Eq, Show)
+data BoxContents = Empty | Gems deriving (Eq, Ord, Show)
 
 contents :: Box -> BoxProp BoxContents
-contents b pos sol = if hasGems b pos sol then Gem else Empty
+contents b pos sol = if hasGems b pos sol then Gems else Empty
 
 eq :: (Eq a) => BoxProp a -> BoxProp a -> ParlorStatement
 eq c1 c2 pos sol = c1 pos sol == c2 pos sol

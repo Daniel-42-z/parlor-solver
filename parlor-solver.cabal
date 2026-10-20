@@ -62,7 +62,7 @@ library
     exposed-modules:
         Parlor
         Puzzle
-        Statement
+        Vocab
 
     -- Modules included in this library but not exported.
     -- other-modules:

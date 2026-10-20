@@ -1,7 +1,7 @@
 module Puzzle (puzzle) where
 
 import Parlor (Box (Black, Blue, White))
-import Statement
+import Vocab
 
 -- Write the puzzle to solve here
 puzzle =
