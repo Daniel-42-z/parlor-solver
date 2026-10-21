@@ -2,6 +2,37 @@
 
 Solve the Parlor Box puzzles from **Blue Prince** and [parlorbox.com](https://parlorbox.com/). Translate the writing on each box into a small vocabulary of Haskell expressions in [Puzzle.hs](Puzzle.hs), then run the solver. No programming experience is needed: keep the supplied file structure and replace its statements using the examples below.
 
+## Table of contents
+
+- [Install Haskell and Cabal](#install-haskell-and-cabal)
+  - [Linux: prefer your distribution's packages](#linux-prefer-your-distributions-packages)
+  - [macOS: Homebrew](#macos-homebrew)
+  - [GHCup fallback for Linux and macOS](#ghcup-fallback-for-linux-and-macos)
+  - [Windows](#windows)
+  - [Select versions with GHCup](#select-versions-with-ghcup)
+  - [Verify your installation](#verify-your-installation)
+- [Get the project and run it](#get-the-project-and-run-it)
+- [Edit the statements in Puzzle.hs](#edit-the-statements-in-puzzlehs)
+  - [Translate the claim, not your verdict](#translate-the-claim-not-your-verdict)
+- [Read the result](#read-the-result)
+- [Basic vocabulary](#basic-vocabulary)
+  - [Gems and truth claims](#gems-and-truth-claims)
+  - [Combine clauses into one statement](#combine-clauses-into-one-statement)
+- [Count and compare](#count-and-compare)
+  - [Worked puzzle: counts and the gem box](#worked-puzzle-counts-and-the-gem-box)
+- [Lambdas: write your own box predicate](#lambdas-write-your-own-box-predicate)
+  - [Combine traits or use a box-dependent count](#combine-traits-or-use-a-box-dependent-count)
+  - [Compare contents](#compare-contents)
+- [Claims about some or all boxes](#claims-about-some-or-all-boxes)
+  - [All three boxes explicitly](#all-three-boxes-explicitly)
+- [Left, right, and other boxes](#left-right-and-other-boxes)
+- [Multiple statements and blank boxes](#multiple-statements-and-blank-boxes)
+  - [Worked puzzle: two statements on each box](#worked-puzzle-two-statements-on-each-box)
+  - [Blank boxes have special counting behavior](#blank-boxes-have-special-counting-behavior)
+- [Final worked puzzle: combine the vocabulary](#final-worked-puzzle-combine-the-vocabulary)
+- [When wording needs manual interpretation](#when-wording-needs-manual-interpretation)
+- [Troubleshooting](#troubleshooting)
+
 ## Install Haskell and Cabal
 
 You need **GHC**, which compiles Haskell, and **Cabal**, which builds and runs this project. Prefer your operating system's package manager when it offers compatible versions. **GHCup** can install specific versions when the packages available for your system do not match this project.
