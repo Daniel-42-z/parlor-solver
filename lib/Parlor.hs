@@ -8,12 +8,14 @@ module Parlor
     allValidSolutions,
     statementsOfBox,
     truthValuesOfBox,
+    processSolutions,
   )
 where
 
 import Data.Function ((&))
 import Data.Map (Map)
 import Data.Map qualified as Map
+import Data.Set qualified as Set
 
 data Box = Blue | White | Black deriving (Eq, Ord, Show)
 
@@ -79,3 +81,14 @@ allValidSolutions pzl =
    in filter
         (checkSolution pzl)
         [ParlorSolution box tvMap | box <- [Blue, White, Black], tvMap <- allTruthValueMaps]
+
+data FinalSolution = Contradictory | Determinate Box | Indeterminate [Box] deriving (Eq, Show)
+
+processSolutions :: [ParlorSolution] -> FinalSolution
+processSolutions solutions = case solutions of
+  [] -> Contradictory
+  (sol : sols) ->
+    let firstAns = answer sol
+     in if all (\solution -> answer solution == firstAns) sols
+          then Determinate $ answer sol
+          else Indeterminate $ Set.toList $ Set.fromList $ map answer solutions
