@@ -8,11 +8,11 @@ module Vocab
     orStatement,
     contents,
     eq,
-    more,
+    moreThan,
     geq,
-    less,
+    lessThan,
     leq,
-    constCount,
+    count,
     allTrueBoxesCount,
     allFalseBoxesCount,
     boxTrueStatementsCount,
@@ -60,8 +60,8 @@ orStatement st1 st2 pos sol = st1 pos sol || st2 pos sol
 
 type BoxProp a = StatementPos -> ParlorSolution -> a
 
-constCount :: Int -> BoxProp Int
-constCount n = \_ _ -> n
+count :: Int -> BoxProp Int
+count n = \_ _ -> n
 
 allTrueBoxesCount :: BoxProp Int
 allTrueBoxesCount _ (ParlorSolution _ tvs) = (Map.elems tvs) & map and & filter id & length
@@ -89,14 +89,14 @@ contents b pos sol = if hasGems b pos sol then Gems else Empty
 eq :: (Eq a) => BoxProp a -> BoxProp a -> ParlorStatement
 eq c1 c2 pos sol = c1 pos sol == c2 pos sol
 
-more :: (Ord a) => BoxProp a -> BoxProp a -> ParlorStatement
-more c1 c2 pos sol = c1 pos sol > c2 pos sol
+moreThan :: (Ord a) => BoxProp a -> BoxProp a -> ParlorStatement
+moreThan c1 c2 pos sol = c1 pos sol > c2 pos sol
 
 geq :: (Ord a) => BoxProp a -> BoxProp a -> ParlorStatement
 geq c1 c2 pos sol = c1 pos sol >= c2 pos sol
 
-less :: (Ord a) => BoxProp a -> BoxProp a -> ParlorStatement
-less c1 c2 pos sol = c1 pos sol < c2 pos sol
+lessThan :: (Ord a) => BoxProp a -> BoxProp a -> ParlorStatement
+lessThan c1 c2 pos sol = c1 pos sol < c2 pos sol
 
 leq :: (Ord a) => BoxProp a -> BoxProp a -> ParlorStatement
 leq c1 c2 pos sol = c1 pos sol <= c2 pos sol
