@@ -244,12 +244,14 @@ The full implementation is in [lib/Vocab.hs](lib/Vocab.hs). The following sectio
 | It is not true that Blue has only true statements.           | `notStatement (allTrue Blue)`              |
 | Blue and White are both empty.                               | ``empty Blue `andStatement` empty White``  |
 | Blue or White is empty, or both are.                         | ``empty Blue `orStatement` empty White``   |
+| Exactly one of Blue and White is empty.                      | ``empty Blue `xorStatement` empty White``  |
 | If Blue has only true statements, White is empty.            | ``allTrue Blue `ifStatement` empty White`` |
 | Blue has only true statements if and only if White is empty. | ``allTrue Blue `iff` empty White``         |
 
 The backtick character (`` ` ``) lets a two-input vocabulary word sit **between** its inputs. For example, ``empty Blue `andStatement` empty White`` also means `andStatement (empty Blue) (empty White)`.
 
-- `orStatement` includes the possibility that both clauses are true. For “exactly one of A or B,” combine “A or B” with “not (A and B).”
+- `orStatement` includes the possibility that both clauses are true.
+- `xorStatement` means exactly one clause is true. It is false when both clauses are true or both are false. For “Exactly one of White and Blue has only true statements,” write ``allTrue White `xorStatement` allTrue Blue``.
 - `ifStatement` takes the **condition first**, then the consequence. It is false only when the condition is true and the consequence is false. A false condition makes the implication true.
 - `iff` is true when both clauses have the same truth value, including when both are false. It makes a stronger claim than a one-way implication.
 - `notStatement (allTrue Blue)` means **at least one false statement**, not necessarily all false. Use `allFalse Blue` for the latter.
@@ -297,6 +299,10 @@ Use `count` to put a fixed number into a comparison; do not write a bare `2` whe
 | Blue has more true statements than White.       | ``boxTrueStatementsCount Blue `moreThan` boxTrueStatementsCount White`` |
 
 `eq`, `moreThan`, `geq`, `lessThan`, and `leq` mean equal, greater than, greater than or equal, less than, and less than or equal, respectively. Counting boxes and statements differ: a box with three true statements contributes **one** to `allTrueBoxesCount` and **three** to `totalTrueStatements`.
+
+To claim there are more entirely true boxes than entirely false boxes, write ``allTrueBoxesCount `moreThan` allFalseBoxesCount``.
+
+The implementation also defines `boxStatementsCount` (all statements on a given box) and `totalStatements` (all statements across the boxes), but neither is currently exported by `Vocab`. They cannot be used in `Puzzle.hs` with the supplied imports.
 
 ### Worked puzzle: counts and the gem box
 

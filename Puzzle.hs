@@ -6,17 +6,17 @@ import Vocab
 -- Write the puzzle to solve here
 puzzle =
   [ ( Blue,
-      [ notStatement $ thisBox hasGems,
-        foldr1 andStatement $ map hasGems allBoxes
+      [ hasGems Black `orStatement` hasGems White,
+        allTrueBoxesCount `moreThan` allFalseBoxesCount
       ]
     ),
     ( White,
-      [ thisBox hasGems,
-        allFalse Black `iff` allTrue Blue
+      [ foldr1 andStatement $ map hasGems allBoxes
       ]
     ),
     ( Black,
-      [ thisBox (\b -> contents White `eq` contents b)
+      [ notStatement $ thisBox hasGems,
+        allTrue White `xorStatement` allTrue Blue
       ]
     )
   ]

@@ -6,6 +6,7 @@ module Vocab
     ifStatement,
     andStatement,
     orStatement,
+    xorStatement,
     contents,
     eq,
     moreThan,
@@ -58,47 +59,56 @@ andStatement st1 st2 pos sol = st1 pos sol && st2 pos sol
 orStatement :: ParlorStatement -> ParlorStatement -> ParlorStatement
 orStatement st1 st2 pos sol = st1 pos sol || st2 pos sol
 
-type BoxProp a = StatementPos -> ParlorSolution -> a
+xorStatement :: ParlorStatement -> ParlorStatement -> ParlorStatement
+xorStatement st1 st2 pos sol = st1 pos sol /= st2 pos sol
 
-count :: Int -> BoxProp Int
+type Prop a = StatementPos -> ParlorSolution -> a
+
+count :: Int -> Prop Int
 count n = \_ _ -> n
 
-allTrueBoxesCount :: BoxProp Int
+allTrueBoxesCount :: Prop Int
 allTrueBoxesCount _ (ParlorSolution _ tvs) = (Map.elems tvs) & map and & filter id & length
 
-allFalseBoxesCount :: BoxProp Int
+allFalseBoxesCount :: Prop Int
 allFalseBoxesCount _ (ParlorSolution _ tvs) = (Map.elems tvs) & map (all not) & filter id & length
 
-boxTrueStatementsCount :: Box -> BoxProp Int
-boxTrueStatementsCount c _ sol = length $ filter id $ truthValuesOfBox sol c
+boxStatementsCount :: Box -> Prop Int
+boxStatementsCount b _ sol = length $ truthValuesOfBox sol b
 
-boxFalseStatementsCount :: Box -> BoxProp Int
-boxFalseStatementsCount c _ sol = length $ filter not $ truthValuesOfBox sol c
+boxTrueStatementsCount :: Box -> Prop Int
+boxTrueStatementsCount b _ sol = length $ filter id $ truthValuesOfBox sol b
 
-totalTrueStatements :: BoxProp Int
-totalTrueStatements pos sol = sum $ map (\c -> boxTrueStatementsCount c pos sol) [Blue, White, Black]
+boxFalseStatementsCount :: Box -> Prop Int
+boxFalseStatementsCount b _ sol = length $ filter not $ truthValuesOfBox sol b
 
-totalFalseStatements :: BoxProp Int
-totalFalseStatements pos sol = sum $ map (\c -> boxFalseStatementsCount c pos sol) [Blue, White, Black]
+totalStatements :: Prop Int
+totalStatements pos sol = sum $ map (\b -> boxStatementsCount b pos sol) allBoxes
+
+totalTrueStatements :: Prop Int
+totalTrueStatements pos sol = sum $ map (\b -> boxTrueStatementsCount b pos sol) allBoxes
+
+totalFalseStatements :: Prop Int
+totalFalseStatements pos sol = sum $ map (\b -> boxFalseStatementsCount b pos sol) allBoxes
 
 data BoxContents = Empty | Gems deriving (Eq, Ord, Show)
 
-contents :: Box -> BoxProp BoxContents
+contents :: Box -> Prop BoxContents
 contents b pos sol = if hasGems b pos sol then Gems else Empty
 
-eq :: (Eq a) => BoxProp a -> BoxProp a -> ParlorStatement
+eq :: (Eq a) => Prop a -> Prop a -> ParlorStatement
 eq c1 c2 pos sol = c1 pos sol == c2 pos sol
 
-moreThan :: (Ord a) => BoxProp a -> BoxProp a -> ParlorStatement
+moreThan :: (Ord a) => Prop a -> Prop a -> ParlorStatement
 moreThan c1 c2 pos sol = c1 pos sol > c2 pos sol
 
-geq :: (Ord a) => BoxProp a -> BoxProp a -> ParlorStatement
+geq :: (Ord a) => Prop a -> Prop a -> ParlorStatement
 geq c1 c2 pos sol = c1 pos sol >= c2 pos sol
 
-lessThan :: (Ord a) => BoxProp a -> BoxProp a -> ParlorStatement
+lessThan :: (Ord a) => Prop a -> Prop a -> ParlorStatement
 lessThan c1 c2 pos sol = c1 pos sol < c2 pos sol
 
-leq :: (Ord a) => BoxProp a -> BoxProp a -> ParlorStatement
+leq :: (Ord a) => Prop a -> Prop a -> ParlorStatement
 leq c1 c2 pos sol = c1 pos sol <= c2 pos sol
 
 type BoxPredicate = Box -> ParlorStatement
